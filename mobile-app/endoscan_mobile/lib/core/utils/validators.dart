@@ -25,7 +25,10 @@ class AppValidators {
   }
 
   /// Valida que las contraseñas coincidan
-  static String? validatePasswordMatch(String? password, String? confirmPassword) {
+  static String? validatePasswordMatch(
+    String? password,
+    String? confirmPassword,
+  ) {
     if (password != confirmPassword) {
       return 'Las contraseñas no coinciden';
     }
@@ -36,6 +39,32 @@ class AppValidators {
   static String? validateRequired(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
       return '$fieldName es requerido';
+    }
+    return null;
+  }
+
+  /// Valida un teléfono
+  static String? validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'El teléfono es requerido';
+    }
+    if (!RegExp(
+      r'^[0-9]{7,15}$',
+    ).hasMatch(value.replaceAll(RegExp(r'[^0-9]'), ''))) {
+      return 'Por favor ingresa un teléfono válido';
+    }
+    return null;
+  }
+
+  /// Valida un DNI/Cédula
+  static String? validateDNI(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'El DNI es requerido';
+    }
+    if (!RegExp(
+      r'^[0-9]{6,10}$',
+    ).hasMatch(value.replaceAll(RegExp(r'[^0-9]'), ''))) {
+      return 'Por favor ingresa un DNI válido';
     }
     return null;
   }

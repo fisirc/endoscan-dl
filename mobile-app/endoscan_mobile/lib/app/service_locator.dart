@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/auth/presentation/viewmodels/login_viewmodel.dart';
+import '../../features/auth/presentation/viewmodels/register_viewmodel.dart';
+import '../../features/dashboard/presentation/viewmodels/dashboard_viewmodel.dart';
 import '../core/constants/app_constants.dart';
 
 /// Configuración de inyección de dependencias
@@ -11,8 +13,12 @@ class ServiceLocator {
   static List<ChangeNotifierProvider> getProviders() {
     return [
       // ViewModels
-      ChangeNotifierProvider<LoginViewModel>(
-        create: (_) => LoginViewModel(),
+      ChangeNotifierProvider<LoginViewModel>(create: (_) => LoginViewModel()),
+      ChangeNotifierProvider<RegisterViewModel>(
+        create: (_) => RegisterViewModel(),
+      ),
+      ChangeNotifierProvider<DashboardViewModel>(
+        create: (_) => DashboardViewModel(),
       ),
     ];
   }
@@ -48,7 +54,7 @@ class ServiceLocator {
   static Future<void> setupDataSources() async {
     // Inicializar SharedPreferences
     await SharedPreferences.getInstance();
-    
+
     // Configurar Dio
     _setupDio();
 

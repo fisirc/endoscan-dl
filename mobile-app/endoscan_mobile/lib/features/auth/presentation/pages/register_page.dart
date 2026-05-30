@@ -3,21 +3,19 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/validators.dart';
-import '../../../dashboard/presentation/pages/dashboard_page.dart';
-import '../pages/register_page.dart';
-import '../viewmodels/login_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
 import '../widgets/app_buttons.dart';
 import '../widgets/app_text_field.dart';
 
-/// Pantalla de Login con arquitectura MVVM
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+/// Pantalla de Registro con arquitectura MVVM
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -25,38 +23,60 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
-        child: Consumer<LoginViewModel>(
+        child: Consumer<RegisterViewModel>(
           builder: (context, viewModel, _) {
-            // Navegar al dashboard cuando sea exitoso
-            if (viewModel.state == AuthState.success) {
-              Future.microtask(() {
-                if (!mounted) return;
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const DashboardPage()),
-                );
-                viewModel.clearSuccess();
-              });
-            }
-
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
                     _buildHeader(context),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 40),
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           AppTextField(
+                            controller: viewModel.nameController,
+                            label: 'Nombre completo',
+                            hintText: 'Tu nombre',
+                            keyboardType: TextInputType.name,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'El nombre es requerido';
+                              }
+                              return null;
+                            },
+                            prefixIcon: const Icon(Icons.person_outline),
+                          ),
+                          const SizedBox(height: 24),
+                          AppTextField(
                             controller: viewModel.emailController,
-                            label: 'Ingrese su nombre de usuario',
-                            hintText: 'usuario@ejemplo.com',
+                            label: 'Email',
+                            hintText: 'tu@email.com',
                             keyboardType: TextInputType.emailAddress,
                             validator: AppValidators.validateEmail,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                          ),
+                          const SizedBox(height: 24),
+                          AppTextField(
+                            controller: viewModel.phoneController,
+                            label: 'Teléfono',
+                            hintText: '+1234567890',
+                            keyboardType: TextInputType.phone,
+                            validator: AppValidators.validatePhone,
+                            prefixIcon: const Icon(Icons.phone_outlined),
+                          ),
+                          const SizedBox(height: 24),
+                          AppTextField(
+                            controller: viewModel.dniController,
+                            label: 'DNI/Cédula',
+                            hintText: '1234567890',
+                            keyboardType: TextInputType.number,
+                            validator: AppValidators.validateDNI,
+                            prefixIcon: const Icon(Icons.assignment_outlined),
                           ),
                           const SizedBox(height: 24),
                           AppTextField(
@@ -65,6 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: '••••••••',
                             obscureText: !viewModel.isPasswordVisible,
                             validator: AppValidators.validatePassword,
+                            prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 viewModel.isPasswordVisible
@@ -72,6 +93,29 @@ class _LoginPageState extends State<LoginPage> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: viewModel.togglePasswordVisibility,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          AppTextField(
+                            controller: viewModel.confirmPasswordController,
+                            label: 'Confirmar contraseña',
+                            hintText: '••••••••',
+                            obscureText: !viewModel.isConfirmPasswordVisible,
+                            validator: (value) {
+                              if (value != viewModel.passwordController.text) {
+                                return 'Las contraseñas no coinciden';
+                              }
+                              return null;
+                            },
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                viewModel.isConfirmPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed:
+                                  viewModel.toggleConfirmPasswordVisibility,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -84,11 +128,11 @@ class _LoginPageState extends State<LoginPage> {
                           if (viewModel.successMessage.isNotEmpty)
                             const SizedBox(height: 24),
                           PrimaryButton(
-                            text: 'Iniciar sesión',
+                            text: 'Registrarse',
                             isLoading: viewModel.isLoading,
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                viewModel.login();
+                                viewModel.register();
                               }
                             },
                           ),
@@ -96,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildSignUpLink(context),
+                    _buildLoginLink(context),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -109,37 +153,38 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Row(
       children: [
-        // Icono circular
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-          ),
-          child: Icon(
-            Icons.person_outline,
-            size: 50,
-            color: AppTheme.primaryColor,
-          ),
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
-        const SizedBox(height: 24),
-        Text(
-          '¡Bienvenido!',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Crear Cuenta',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Únete a EndoScan',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+              ),
+            ],
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildErrorBanner(LoginViewModel viewModel) {
+  Widget _buildErrorBanner(RegisterViewModel viewModel) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -162,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildSuccessBanner(LoginViewModel viewModel) {
+  Widget _buildSuccessBanner(RegisterViewModel viewModel) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -185,33 +230,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildDivider(BuildContext context) {
-    return SizedBox.shrink();
-  }
-
-  Widget _buildSocialLogin() {
-    return SizedBox.shrink();
-  }
-
-  Widget _buildSignUpLink(BuildContext context) {
+  Widget _buildLoginLink(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '¿No tienes cuenta? ',
+          '¿Ya tienes cuenta? ',
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
         ),
         TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const RegisterPage()),
-            );
-          },
+          onPressed: () => Navigator.pop(context),
           child: const Text(
-            'Registrate',
+            'Inicia sesión',
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.w600,
