@@ -1,0 +1,1 @@
+"""EndoScan Backend Application"""
