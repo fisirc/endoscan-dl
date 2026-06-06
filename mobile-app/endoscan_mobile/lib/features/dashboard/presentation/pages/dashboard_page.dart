@@ -6,6 +6,7 @@ import '../widgets/appointment_card.dart';
 import '../widgets/quick_action_button.dart';
 import '../widgets/statistics_card.dart';
 import '../viewmodels/dashboard_viewmodel.dart';
+import '../../../patients/presentation/pages/patients_page.dart';
 
 /// Página del Dashboard - Pantalla principal después del login
 class DashboardPage extends StatefulWidget {
@@ -118,7 +119,13 @@ class _DashboardPageState extends State<DashboardPage> {
                     QuickActionButton(
                       label: 'Ver pacientes',
                       icon: Icons.people_outline,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PatientsPage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     QuickActionButton(
