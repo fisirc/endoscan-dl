@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'app/service_locator.dart';
@@ -10,6 +11,9 @@ void main() async {
 
   // Inicializar dependencias
   await ServiceLocator.setupDataSources();
+
+  // Inicializar formatos de fecha para locales (usar 'es_ES' en la app)
+  await initializeDateFormatting('es_ES');
 
   runApp(const MyApp());
 }

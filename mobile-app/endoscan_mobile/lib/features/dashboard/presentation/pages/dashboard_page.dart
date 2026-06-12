@@ -7,6 +7,9 @@ import '../widgets/quick_action_button.dart';
 import '../widgets/statistics_card.dart';
 import '../viewmodels/dashboard_viewmodel.dart';
 import '../../../patients/presentation/pages/patients_page.dart';
+import '../../../appointments/presentation/pages/appointments_page.dart';
+import '../../../analysis/presentation/pages/classification_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 /// Página del Dashboard - Pantalla principal después del login
 class DashboardPage extends StatefulWidget {
@@ -131,19 +134,37 @@ class _DashboardPageState extends State<DashboardPage> {
                     QuickActionButton(
                       label: 'Ver citas',
                       icon: Icons.calendar_today,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AppointmentsPage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     QuickActionButton(
                       label: 'Clasificar imagen',
                       icon: Icons.image_outlined,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ClassificationPage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     QuickActionButton(
                       label: 'Mi Perfil',
                       icon: Icons.person_outline,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ProfilePage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 32),
 
